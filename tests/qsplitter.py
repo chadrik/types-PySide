@@ -1,7 +1,6 @@
 from PySide2.QtWidgets import QSplitter
-
-
-b = b""
+from PySide2.QtCore import QByteArray
 
 s = QSplitter()
-b = bytes(s.saveState())
+b = s.saveState()
+assert isinstance(b, QByteArray)

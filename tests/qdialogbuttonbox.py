@@ -5,7 +5,9 @@ a = (
     QtWidgets.QDialogButtonBox.StandardButton.Ok
     | QtWidgets.QDialogButtonBox.StandardButton.Ok
 )
+assert isinstance(a, QtWidgets.QDialogButtonBox.StandardButtons)
 d = (
     a | QtWidgets.QDialogButtonBox.StandardButton.Ok
-)  # type: QtWidgets.QDialogButtonBox.StandardButtons
-e = a | a  # type: QtWidgets.QDialogButtonBox.StandardButtons
+)
+assert isinstance(d, QtWidgets.QDialogButtonBox.StandardButtons)
+e = a | a

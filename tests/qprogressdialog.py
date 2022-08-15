@@ -1,6 +1,4 @@
-from typing import Callable
+from PySide2 import QtWidgets
 
-from PySide2.QtWidgets import QProgressDialog
-
-qp = QProgressDialog()
+qp = QtWidgets.QProgressDialog()
 qp.setCancelButton(None)

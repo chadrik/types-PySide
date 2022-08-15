@@ -7,7 +7,7 @@ def slotAppStateChanged(*args: Any) -> None:
     pass
 
 
-app = cast(QApplication, QApplication.instance())
+app = QApplication.instance()
 app.applicationStateChanged.connect(slotAppStateChanged)
 QApplication.processEvents()
 

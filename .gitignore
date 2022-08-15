@@ -1,0 +1,33 @@
+build/
+__pycache__
+*.py[cod]
+*~
+@*
+/build
+/env
+docs/build/
+*.iml
+/out/
+.venv/
+.mypy_cache/
+.pytest_cache/
+.incremental_checker_cache.json
+.cache
+.tox
+.runtest_log.json
+dist
+
+# Packages
+*.egg
+*.egg-info
+
+# IDEs
+.idea
+*.swp
+
+# Operating Systems
+.DS_store
+
+# Coverage Files
+htmlcov
+.coverage*

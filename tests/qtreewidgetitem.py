@@ -3,13 +3,6 @@ from PySide2.QtCore import Qt
 from PySide2.QtGui import QColor
 
 
-class MyTreeWidgetItem(QTreeWidgetItem):
-
-    # add comparison indicator to allow custom sorting of items
-    def __lt__(self, other: QTreeWidgetItem) -> bool:
-        return super().__lt__(other)
-
-
 t = QTreeWidgetItem()
 
 b = True  # type: bool

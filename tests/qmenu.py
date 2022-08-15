@@ -1,6 +1,7 @@
 from typing import Any
 from PySide2.QtWidgets import QMenu, QTreeWidget
 
+# FIXME: this test does not execute at runtime
 # the default version of pyside2 stubs would not detect missing attributes
 # this test verifies that this is fixed
 

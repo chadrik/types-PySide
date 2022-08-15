@@ -6,7 +6,7 @@ import pydoc
 import typing
 from typing import Any, List, Optional, Iterable, Mapping, Tuple
 from types import ModuleType
-from functools import lru_cache
+from functools import lru_cache, total_ordering
 
 import mypy.stubgen
 import mypy.stubgenc
@@ -208,22 +208,80 @@ def is_redundant_overload(sig: mypy.stubgenc.FunctionSig, sigs: List[mypy.stubge
     return False
 
 
+@total_ordering
+class OptionalKey:
+    """
+    Util to simplify optional hierarchical keys.
+
+    Allows this to be true:
+        OptionalKey('foo') == OptionalKey(None)
+    """
+    def __init__(self, s):
+        self.s = s
+
+    def __repr__(self):
+        return 'OptionalKey({})'.format(repr(self.s))
+
+    def __hash__(self):
+        # Use the same hash as None, so that we get a chance to run __eq__ when
+        # compared to None as a dictionary key
+        return hash(None)
+
+    def __eq__(self, other):
+        if isinstance(other, OptionalKey):
+            other = other.s
+        if self.s is None or other is None:
+            return True
+        return other == self.s
+
+    def __lt__(self, other):
+        if isinstance(other, OptionalKey):
+            other = other.s
+        return other < self.s
+
+
+assert OptionalKey('foo') == None
+assert OptionalKey('foo') == 'foo'
+assert OptionalKey('foo') == OptionalKey(None)
+{OptionalKey(None): 'this'}[OptionalKey('foo')]
+{OptionalKey('foo'): 'this'}[OptionalKey('foo')]
+# {(None, 'bar'): 'this'}[(OptionalKey('foo'), 'bar')]
+{OptionalKey(None): 'this'}[OptionalKey('foo')]
+{(OptionalKey(None), 'bar'): 'this'}[(OptionalKey('foo'), 'bar')]
+
+ANY = None
+
+
 class PySideSignatureGenerator(mypy.stubgenc.SignatureGenerator):
     docstring = mypy.stubgenc.DocstringSignatureGenerator()
 
-    overrides = {
+    # Complete signature replacements.
+    # The class name can be None, in which case it will match
+    _signature_overrides = {
         # these docstring sigs are malformed
-        ('VolatileBool', 'get'): '(self) -> bool',
-        ('VolatileBool', 'set'): '(self, a: object) -> None',
+        ('VolatileBool', 'get'):
+            '(self) -> bool',
+        ('VolatileBool', 'set'):
+            '(self, a: object) -> None',
 
         # add missing type info
         ('Signal', '__get__'):
-            '(self, instance, owner) -> SignalInstance',
+            [
+                '(self, instance: None, owner: typing.Type[QObject]) -> Signal',
+                '(self, instance: QObject, owner: typing.Type[QObject]) -> SignalInstance',
+            ],
         ('Signal', '__getitem__'):
             '(self, index) -> SignalInstance',
         ('SignalInstance', '__getitem__'):
             '(self, index) -> SignalInstance',
 
+        # slot arg should be typing.Callable instead of object
+        ('SignalInstance', 'connect'):
+            '(self, slot: typing.Callable, type: typing.Union[type,None] = ...) -> bool',
+        ('SignalInstance', 'disconnect'):
+            '(self, slot: typing.Union[typing.Callable,None] = ...) -> None',
+
+        # FIXME: QObject.connect overloads use a mixture of methods and classmethods.  does mypy support this?  if not can we use a descriptor?  should these overloads be moved to SignalInstance?
         # docstring sig for these declare name as bytes, which is not correct.
         # not sure how many more issues like this exist.
         ('QObject', 'setProperty'):
@@ -232,22 +290,36 @@ class PySideSignatureGenerator(mypy.stubgenc.SignatureGenerator):
             '(self, name: str) -> typing.Any',
         ('QState', 'assignProperty'):
             '(self, object: QObject, name: str, value: typing.Any) -> None',
-        (None, 'propertyName'):
+        (ANY, 'propertyName'):
             '(self) -> str',
-
+        ('QCoreApplication', 'translate'):
+            '(cls, context: str, key: str, disambiguation: typing.Union[str,NoneType] = ..., n: int = ...) -> str',
         # Other issues
         ('QTreeWidgetItemIterator', '__iter__'):
-            '(self) -> Iterator[QTreeWidgetItemIterator]',
+            '(self) -> typing.Iterator[QTreeWidgetItemIterator]',
         ('QTreeWidgetItemIterator', '__next__'):
             '(self) -> QTreeWidgetItemIterator',
-        ('QLabel', 'setPixmap'):
-            '(self, arg__1: typing.Optional[PySide2.QtGui.QPixmap]) -> None',
         ('QLayout', 'itemAt'):
             # make optional
             '(self, index: int) -> typing.Optional[PySide*.QtWidgets.QLayoutItem]',
         ('QLayout', 'takeAt'):
             # make optional
             '(self, index: int) -> typing.Optional[PySide*.QtWidgets.QLayoutItem]',
+        ('QPolygon', '__lshift__'):
+            # first and third overload should return QPolygon
+            [
+                '(self, l: typing.List[PySide2.QtCore.QPoint]) -> PySide2.QtCore.QPolygon',
+                '(self, stream: PySide2.QtCore.QDataStream) -> PySide2.QtCore.QDataStream',
+                '(self, t: PySide2.QtCore.QPoint) -> PySide2.QtCore.QPolygon',
+            ],
+        ('QPolygon', '__iadd__'):
+            # should return QPolygon
+            '(self, t: PySide2.QtCore.QPoint) -> PySide2.QtCore.QPolygon',
+
+        # QByteArray
+        ('QByteArray', '__getitem__'):
+            # missing index and return
+            '(self, index: int) -> bytes',
 
         # Replace object with Any:
         ('QSettings', 'value'):
@@ -268,23 +340,23 @@ class PySideSignatureGenerator(mypy.stubgenc.SignatureGenerator):
         ('QFrame', 'setFrameStyle'):
             '(self, arg__1: typing.Union[PySide*.QtWidgets.QFrame.Shape, '
             'PySide*.QtWidgets.QFrame.Shadow, typing.SupportsInt]) -> None',
-        # in PySide2 this takes int, and in PySide2 it takes Weight, but both seem valid
+        # in PySide2 this takes int, and in PySide6 it takes Weight, but both seem valid
         ('QFont', 'setWeight'):
             '(self, arg__1: typing.Union[int, PySide*.QtGui.QFont.Weight]) -> None',
         # ('QFont', 'weight'): pyside('(self) -> PySide*.QtGui.QFont.Weight'),  # fixed in PySide6
 
         # Fix QModelIndex typed as int in many places:
-        (None, 'selectedIndexes'):
+        (ANY, 'selectedIndexes'):
             # known offenders: QAbstractItemView, QItemSelectionModel, QTreeView, QListView
-            '(self) -> typing.List[QModelIndex]',
+            '(self) -> typing.List[PySide*.QtCore.QModelIndex]',
         ('QItemSelectionModel', 'selectedColumns'):
-            '(self, row: int = ...) -> typing.List[QModelIndex]',
+            '(self, row: int = ...) -> typing.List[PySide*.QtCore.QModelIndex]',
         ('QItemSelectionModel', 'selectedRows'):
-            '(self, column: int = ...) -> typing.List[QModelIndex]',
+            '(self, column: int = ...) -> typing.List[PySide*.QtCore.QModelIndex]',
         ('QItemSelection', 'indexes'):
-            '(self) -> typing.List[QModelIndex]',
+            '(self) -> typing.List[PySide*.QtCore.QModelIndex]',
         ('QItemSelectionRange', 'indexes'):
-            '(self) -> typing.List[QModelIndex]',
+            '(self) -> typing.List[PySide*.QtCore.QModelIndex]',
         ('QAbstractItemModel', 'mimeData'):
             '(self, indexes: typing.List[PySide*.QtCore.QModelIndex]) -> PySide*.QtCore.QMimeData',
         ('QStandardItemModel', 'mimeData'):
@@ -295,20 +367,21 @@ class PySideSignatureGenerator(mypy.stubgenc.SignatureGenerator):
             '(cls: typing.Type[T]) -> T',
         ('QObject', 'findChild'):
             '(self, arg__1: typing.Type[T], arg__2: str = ...) -> T',
-        ('QObject', 'findChildren'):
-            '(self, arg__1: typing.Type[T], arg__2: QRegExp) -> typing.Iterable[T]\n'
-            '(self, arg__1: typing.Type[T], arg__2: QRegularExpression) -> typing.Iterable[T]\n'
-            '(self, arg__1: typing.Type[T], arg__2: str = ...) -> typing.Iterable[T]\n',
-
+        ('QObject', 'findChildren'): [
+            '(self, arg__1: typing.Type[T], arg__2: QRegExp = ...) -> typing.List[T]',
+            '(self, arg__1: typing.Type[T], arg__2: QRegularExpression = ...) -> typing.List[T]',
+            '(self, arg__1: typing.Type[T], arg__2: str = ...) -> typing.List[T]',
+        ],
         # signatures for these special methods include many inaccurate overloads
-        (None, '__ne__'): '(self, other: object) -> bool',
-        (None, '__eq__'): '(self, other: object) -> bool',
-        (None, '__lt__'): '(self, other: object) -> bool',
-        (None, '__gt__'): '(self, other: object) -> bool',
-        (None, '__le__'): '(self, other: object) -> bool',
-        (None, '__ge__'): '(self, other: object) -> bool',
+        (ANY, '__ne__'): '(self, other: object) -> bool',
+        (ANY, '__eq__'): '(self, other: object) -> bool',
+        (ANY, '__lt__'): '(self, other: object) -> bool',
+        (ANY, '__gt__'): '(self, other: object) -> bool',
+        (ANY, '__le__'): '(self, other: object) -> bool',
+        (ANY, '__ge__'): '(self, other: object) -> bool',
     }
 
+    # Special methods for flag enums.
     flag_overrides = {
         # FIXME: QFrame.Shape and QFrame.Shadow are meant to be used with each other and return an int
         '__or__': '(self, other: typing.SupportsInt) -> {}',
@@ -328,32 +401,58 @@ class PySideSignatureGenerator(mypy.stubgenc.SignatureGenerator):
         '__invert__': '(self) -> {}',
     }
 
-    arg_type_overrides = {
-        # there are apparently numerous cases where types can be provided that are automatically
-        # cast, but I'm not sure what the rules are.  I've included a few for convenience, but
-        # it may be better to enforce greater strictness than maintain this incomplete set of
-        # rules.  for example, in addition to the exceptions below, QColor can be provided where
-        # QBrush is expected, and QEasingCurve.Type (enum) can be provided instead of QEasingCurve.
+    # Types that have implicit alternatives.
+    _arg_type_overrides = {
         'PySide2.QtGui.QKeySequence':
-            # add str
-            'typing.Union[PySide2.QtGui.QKeySequence,str]',
-        'typing.Union[PySide2.QtGui.QKeySequence,NoneType]':
-            # add str
-            'typing.Union[PySide2.QtGui.QKeySequence,str,None]',
+            ['str'],
         'PySide2.QtGui.QColor':
-            # add GlobalColor
-            'typing.Union[PySide2.QtGui.QColor,PySide2.QtCore.Qt.GlobalColor]',
+            ['PySide2.QtCore.Qt.GlobalColor'],
         'PySide2.QtCore.QByteArray':
-            # add bytes
-            'typing.Union[PySide2.QtCore.QByteArray, bytes]',
+            ['bytes'],
+        'PySide2.QtGui.QBrush':
+            ['PySide2.QtGui.QColor', 'PySide2.QtCore.Qt.GlobalColor'],
+        'PySide2.QtGui.QCursor':
+            ['PySide2.QtCore.Qt.CursorShape'],
     }
 
+    # Values which should be made Optional[].
+    # the bool indicates if the argument has a default (e.g. arg = ...)
+    _optional_args = {
+        ('QPainter', 'drawText', 'br'): True,
+        ('QPainter', 'drawPolygon', 'arg__2'): True,
+        ('QProgressDialog', 'setCancelButton', 'button'): False,
+        (ANY, 'setModel', 'model'): False,
+        ('QLabel', 'setPixmap', 'arg__1'): False,
+    }
+
+    # Add new overloads to existing functions.
     new_overloads = {
         ('QDate', '__init__'):
-            '__init__(self, date: datetime.date) -> None',
+            '(self, date: datetime.date) -> None',
         ('QDateTime', '__init__'):
-            '__init__(self, datetime: datetime.datetime) -> None',
+            '(self, datetime: datetime.datetime) -> None',
     }
+
+    def __init__(self):
+        arg_type_overrides = {
+            orig: 'typing.Union[{},{}]'.format(orig, ','.join(alt))
+            for orig, alt in self._arg_type_overrides.items()
+        }
+        arg_type_overrides.update({
+            'typing.Union[{},NoneType]'.format(orig):
+                 'typing.Union[{},{},NoneType]'.format(orig, ','.join(alt))
+            for orig, alt in self._arg_type_overrides.items()
+        })
+        self.arg_type_overrides = arg_type_overrides
+
+        self.signature_overrides = {
+            (OptionalKey(key[0]),) + key[1:]: value
+            for key, value in self._signature_overrides.items()
+        }
+        self.optional_args = {
+            (OptionalKey(key[0]),) + key[1:]: value
+            for key, value in self._optional_args.items()
+        }
 
     def get_function_sig(self, func: object, module_name: str, name: str
                          ) -> Optional[List[mypy.stubgenc.FunctionSig]]:
@@ -368,20 +467,20 @@ class PySideSignatureGenerator(mypy.stubgenc.SignatureGenerator):
             docstr = self.flag_overrides.get(name)
             if docstr:
                 is_flag_type = True
-                if is_flag_item(typ) and name != '__invert__':
+                if is_flag_item(typ):
                     return_type = get_group_from_flag_item(typ)
                 else:
                     return_type = typ
                 docstr = docstr.format(mypy.stubgenc.get_type_fullname(return_type))
         if not docstr:
-            docstr = self.overrides.get((class_name, name))
-        if not docstr:
-            # try again without the class
-            docstr = self.overrides.get((None, name))
+            docstr = self.signature_overrides.get((OptionalKey(class_name), name))
 
         if docstr:
             # process our override
-            docstr = name + pyside(docstr)
+            if isinstance(docstr, list):
+                docstr = '\n'.join(name + pyside(d) for d in docstr)
+            else:
+                docstr = name + pyside(docstr)
             results = mypy.stubgenc.infer_sig_from_docstring(docstr, name)
         else:
             # call the standard docstring-based generator
@@ -399,15 +498,17 @@ class PySideSignatureGenerator(mypy.stubgenc.SignatureGenerator):
                     if not arg.type:
                         continue
                     arg_type = arg.type.replace(' ', '')
-                    # class + method + arg:
-                    if class_name == 'QPainter' and name == 'drawText' and arg.name == 'br':
-                        arg.type = 'typing.Optional[{}]'.format(arg.type)
-                        arg.default = True
-                    # method + arg:
-                    elif name == 'setModel' and arg.name == 'model':
-                        arg.type = 'typing.Optional[{}]'.format(arg_type)
+                    if (OptionalKey(class_name), name, arg.name) in self.optional_args:
+                        # use Union[{}, NoneType] so that further replacements can be
+                        # made by arg_type_overrides
+                        has_default = self.optional_args[(OptionalKey(class_name), name, arg.name)]
+                        if has_default:
+                            arg.default = True
+                        else:
+                            arg.type = 'typing.Union[{},NoneType]'.format(arg_type)
+                    # FIXME: replace typing.Sequence with typing.Iterable
                     # arg + type:
-                    elif arg.name == 'parent' and short_name(arg_type) in ('QWidget', 'QObject'):
+                    if arg.name == 'parent' and short_name(arg_type) in ('QWidget', 'QObject'):
                         arg.type = 'typing.Optional[{}]'.format(arg_type)
                     elif arg.name in ('flags', 'weight') and arg_type == 'int':
                         arg.type = 'typing.SupportsInt'
@@ -435,7 +536,8 @@ class PySideSignatureGenerator(mypy.stubgenc.SignatureGenerator):
 
             new_overloads = self.new_overloads.get((class_name, name))
             if new_overloads:
-                results.extend(mypy.stubgenc.infer_sig_from_docstring(new_overloads, name))
+                docstr = name + new_overloads
+                results.extend(mypy.stubgenc.infer_sig_from_docstring(docstr, name))
 
         return results
 
@@ -509,7 +611,7 @@ def generate_stub_for_c_module(module_name: str,
 
 
 def add_typing_import(output: List[str]) -> List[str]:
-    output = _orig_add_typing_import(output)
+    # output = _orig_add_typing_import(output)
     for i, line in enumerate(output):
         if line.startswith('import typing'):
             return output[:i] + [line, "T = typing.TypeVar('T')"] + output[i + 1:]

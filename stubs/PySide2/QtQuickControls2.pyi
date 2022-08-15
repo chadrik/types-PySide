@@ -1,5 +1,3 @@
-from typing import List
-
 import shiboken2
 import typing
 T = typing.TypeVar('T')
