@@ -90,25 +90,25 @@ def test_on_one_flag_class() -> None:
     oneOrMultiFlagValueTest |= 1
     assert_type_of_value_multiFlag(oneOrMultiFlagValueTest)  # type: ignore[arg-type]	# mypy limitation here
 
-    oneFlagOrIntValue = oneFlagValue1  # reset type and value
-    assert_type_of_value_oneFlag(oneFlagOrIntValue)
-    oneFlagOrIntValue &= 1
-    assert_type_of_value_multiFlag(oneFlagOrIntValue)  # type: ignore[arg-type]	# mypy limitation here
+    oneOrMultiFlagValueTest = oneFlagValue1  # reset type and value
+    assert_type_of_value_oneFlag(oneOrMultiFlagValueTest)
+    oneOrMultiFlagValueTest &= 1
+    assert_type_of_value_multiFlag(oneOrMultiFlagValueTest)  # type: ignore[arg-type]	# mypy limitation here
 
-    oneFlagOrIntValue = oneFlagValue1  # reset type and value
-    assert_type_of_value_oneFlag(oneFlagOrIntValue)
-    oneFlagOrIntValue &= oneFlagValue2
-    assert_type_of_value_multiFlag(oneFlagOrIntValue)  # type: ignore[arg-type]	# mypy limitation here
+    oneOrMultiFlagValueTest = oneFlagValue1  # reset type and value
+    assert_type_of_value_oneFlag(oneOrMultiFlagValueTest)
+    oneOrMultiFlagValueTest &= oneFlagValue2
+    assert_type_of_value_multiFlag(oneOrMultiFlagValueTest)  # type: ignore[arg-type]	# mypy limitation here
 
-    oneFlagOrIntValue = oneFlagValue1  # reset type and value
-    assert_type_of_value_oneFlag(oneFlagOrIntValue)
-    oneFlagOrIntValue ^= 1
-    assert_type_of_value_multiFlag(oneFlagOrIntValue)  # type: ignore[arg-type]	# mypy limitation here
+    oneOrMultiFlagValueTest = oneFlagValue1  # reset type and value
+    assert_type_of_value_oneFlag(oneOrMultiFlagValueTest)
+    oneOrMultiFlagValueTest ^= 1
+    assert_type_of_value_multiFlag(oneOrMultiFlagValueTest)  # type: ignore[arg-type]	# mypy limitation here
 
-    oneFlagOrIntValue = oneFlagValue1  # reset type and value
-    assert_type_of_value_oneFlag(oneFlagOrIntValue)
-    oneFlagOrIntValue ^= oneFlagValue2
-    assert_type_of_value_multiFlag(oneFlagOrIntValue)  # type: ignore[arg-type]	# mypy limitation here
+    oneOrMultiFlagValueTest = oneFlagValue1  # reset type and value
+    assert_type_of_value_oneFlag(oneOrMultiFlagValueTest)
+    oneOrMultiFlagValueTest ^= oneFlagValue2
+    assert_type_of_value_multiFlag(oneOrMultiFlagValueTest)  # type: ignore[arg-type]	# mypy limitation here
 
     # +/- operations are forbidden
     pytest.raises(TypeError, lambda: oneFlagValue1 + 1)  # type: ignore[operator]
