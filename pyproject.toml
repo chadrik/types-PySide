@@ -1,43 +1,38 @@
-[tool.poetry]
-name = "mypy-runner"
-version = "0.3.1"
-description = "Run mypy with options to filter errors and colorize output"
-authors = ["Chad Dombrova <chadrik@gmail.com>"]
-license = "MIT"
-readme = "README.md"
-repository = "https://github.com/chadrik/pyside-stubs"
-packages = [
-    { include = "mypyrun.py" },
-]
-keywords = ["stubs", "typing", "annotations", "mypy"]
-classifiers = [
-    # How mature is this project? Common values are
-    #   3 - Alpha
-    #   4 - Beta
-    #   5 - Production/Stable
-    'Development Status :: 5 - Production/Stable',
-
-    # Indicate who your project is intended for
-    'Intended Audience :: Developers',
-    'Topic :: Software Development :: Build Tools',
-
-    # Pick your license as you wish (should match "license" above)
-    'License :: OSI Approved :: MIT License',
-
-    'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.7',
-]
-
-[tool.poetry.extras]
-tests = [
-    "pytest",
-    "coverage",
-    "mypy",
-]
-
-[tool.poetry.dev-dependencies]
-tox = "^3.20"
-
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "types-PySide2"
+readme = "README.md"
+authors = [
+    {name = "Chad Dombrova"}
+]
+description = "The most accurate stubs for PySide2"
+license = {text = "LGPL v2.1"}
+
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU Lesser General Public License v2 (LGPLv2)",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Developers",
+    "Typing :: Stubs Only",
+]
+dynamic = ["version"]
+
+[project.urls]
+"Homepage" = "https://github.com/chadrik/types-pyside"
+"Bug Tracker" = "https://github.com/chadrik/types-pyside/issues"
+
+[tool.setuptools.dynamic]
+version = {file = "VERSION"}
+
+[tool.setuptools.packages.find]
+include = ["*-stubs"]
+exclude = [
+    "tests*",
+    "pyside_stubgen.py",
+    "genstubs.sh",
+    "VERSION",
+]
