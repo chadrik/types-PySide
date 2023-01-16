@@ -245,105 +245,105 @@ class QTest(shiboken2.Object):
     def currentTestFailed(cls) -> bool: ...
     @classmethod
     def currentTestFunction(cls) -> bytes: ...
-    @classmethod
     @overload
+    @classmethod
     def ignoreMessage(cls, type: PySide2.QtCore.QtMsgType, message: bytes) -> None: ...
-    @classmethod
     @overload
+    @classmethod
     def ignoreMessage(cls, type: PySide2.QtCore.QtMsgType, messagePattern: PySide2.QtCore.QRegularExpression) -> None: ...
-    @classmethod
     @overload
+    @classmethod
     def keyClick(cls, widget: PySide2.QtWidgets.QWidget, key: PySide2.QtCore.Qt.Key, modifier: typing.Union[PySide2.QtCore.Qt.KeyboardModifiers,PySide2.QtCore.Qt.KeyboardModifier] = ..., delay: int = ...) -> None: ...
-    @classmethod
     @overload
+    @classmethod
     def keyClick(cls, widget: PySide2.QtWidgets.QWidget, key: int, modifier: typing.Union[PySide2.QtCore.Qt.KeyboardModifiers,PySide2.QtCore.Qt.KeyboardModifier] = ..., delay: int = ...) -> None: ...
-    @classmethod
     @overload
+    @classmethod
     def keyClick(cls, window: PySide2.QtGui.QWindow, key: PySide2.QtCore.Qt.Key, modifier: typing.Union[PySide2.QtCore.Qt.KeyboardModifiers,PySide2.QtCore.Qt.KeyboardModifier] = ..., delay: int = ...) -> None: ...
-    @classmethod
     @overload
+    @classmethod
     def keyClick(cls, window: PySide2.QtGui.QWindow, key: int, modifier: typing.Union[PySide2.QtCore.Qt.KeyboardModifiers,PySide2.QtCore.Qt.KeyboardModifier] = ..., delay: int = ...) -> None: ...
     @classmethod
     def keyClicks(cls, widget: PySide2.QtWidgets.QWidget, sequence: str, modifier: typing.Union[PySide2.QtCore.Qt.KeyboardModifiers,PySide2.QtCore.Qt.KeyboardModifier] = ..., delay: int = ...) -> None: ...
-    @classmethod
     @overload
+    @classmethod
     def keyEvent(cls, action: QTest.KeyAction, widget: PySide2.QtWidgets.QWidget, ascii: int, modifier: typing.Union[PySide2.QtCore.Qt.KeyboardModifiers,PySide2.QtCore.Qt.KeyboardModifier] = ..., delay: int = ...) -> None: ...
-    @classmethod
     @overload
+    @classmethod
     def keyEvent(cls, action: QTest.KeyAction, widget: PySide2.QtWidgets.QWidget, key: PySide2.QtCore.Qt.Key, modifier: typing.Union[PySide2.QtCore.Qt.KeyboardModifiers,PySide2.QtCore.Qt.KeyboardModifier] = ..., delay: int = ...) -> None: ...
-    @classmethod
     @overload
+    @classmethod
     def keyEvent(cls, action: QTest.KeyAction, window: PySide2.QtGui.QWindow, ascii: int, modifier: typing.Union[PySide2.QtCore.Qt.KeyboardModifiers,PySide2.QtCore.Qt.KeyboardModifier] = ..., delay: int = ...) -> None: ...
-    @classmethod
     @overload
+    @classmethod
     def keyEvent(cls, action: QTest.KeyAction, window: PySide2.QtGui.QWindow, key: PySide2.QtCore.Qt.Key, modifier: typing.Union[PySide2.QtCore.Qt.KeyboardModifiers,PySide2.QtCore.Qt.KeyboardModifier] = ..., delay: int = ...) -> None: ...
-    @classmethod
     @overload
+    @classmethod
     def keyPress(cls, widget: PySide2.QtWidgets.QWidget, key: PySide2.QtCore.Qt.Key, modifier: typing.Union[PySide2.QtCore.Qt.KeyboardModifiers,PySide2.QtCore.Qt.KeyboardModifier] = ..., delay: int = ...) -> None: ...
-    @classmethod
     @overload
+    @classmethod
     def keyPress(cls, widget: PySide2.QtWidgets.QWidget, key: int, modifier: typing.Union[PySide2.QtCore.Qt.KeyboardModifiers,PySide2.QtCore.Qt.KeyboardModifier] = ..., delay: int = ...) -> None: ...
-    @classmethod
     @overload
+    @classmethod
     def keyPress(cls, window: PySide2.QtGui.QWindow, key: PySide2.QtCore.Qt.Key, modifier: typing.Union[PySide2.QtCore.Qt.KeyboardModifiers,PySide2.QtCore.Qt.KeyboardModifier] = ..., delay: int = ...) -> None: ...
-    @classmethod
     @overload
+    @classmethod
     def keyPress(cls, window: PySide2.QtGui.QWindow, key: int, modifier: typing.Union[PySide2.QtCore.Qt.KeyboardModifiers,PySide2.QtCore.Qt.KeyboardModifier] = ..., delay: int = ...) -> None: ...
-    @classmethod
     @overload
+    @classmethod
     def keyRelease(cls, widget: PySide2.QtWidgets.QWidget, key: PySide2.QtCore.Qt.Key, modifier: typing.Union[PySide2.QtCore.Qt.KeyboardModifiers,PySide2.QtCore.Qt.KeyboardModifier] = ..., delay: int = ...) -> None: ...
-    @classmethod
     @overload
+    @classmethod
     def keyRelease(cls, widget: PySide2.QtWidgets.QWidget, key: int, modifier: typing.Union[PySide2.QtCore.Qt.KeyboardModifiers,PySide2.QtCore.Qt.KeyboardModifier] = ..., delay: int = ...) -> None: ...
-    @classmethod
     @overload
+    @classmethod
     def keyRelease(cls, window: PySide2.QtGui.QWindow, key: PySide2.QtCore.Qt.Key, modifier: typing.Union[PySide2.QtCore.Qt.KeyboardModifiers,PySide2.QtCore.Qt.KeyboardModifier] = ..., delay: int = ...) -> None: ...
-    @classmethod
     @overload
+    @classmethod
     def keyRelease(cls, window: PySide2.QtGui.QWindow, key: int, modifier: typing.Union[PySide2.QtCore.Qt.KeyboardModifiers,PySide2.QtCore.Qt.KeyboardModifier] = ..., delay: int = ...) -> None: ...
-    @classmethod
     @overload
+    @classmethod
     def keySequence(cls, widget: PySide2.QtWidgets.QWidget, keySequence: typing.Union[PySide2.QtGui.QKeySequence,str]) -> None: ...
-    @classmethod
     @overload
+    @classmethod
     def keySequence(cls, window: PySide2.QtGui.QWindow, keySequence: typing.Union[PySide2.QtGui.QKeySequence,str]) -> None: ...
     @classmethod
     def keyToAscii(cls, key: PySide2.QtCore.Qt.Key) -> int: ...
-    @classmethod
     @overload
+    @classmethod
     def mouseClick(cls, widget: PySide2.QtWidgets.QWidget, button: PySide2.QtCore.Qt.MouseButton, stateKey: typing.Union[PySide2.QtCore.Qt.KeyboardModifiers,PySide2.QtCore.Qt.KeyboardModifier] = ..., pos: PySide2.QtCore.QPoint = ..., delay: int = ...) -> None: ...
-    @classmethod
     @overload
+    @classmethod
     def mouseClick(cls, window: PySide2.QtGui.QWindow, button: PySide2.QtCore.Qt.MouseButton, stateKey: typing.Union[PySide2.QtCore.Qt.KeyboardModifiers,PySide2.QtCore.Qt.KeyboardModifier] = ..., pos: PySide2.QtCore.QPoint = ..., delay: int = ...) -> None: ...
-    @classmethod
     @overload
+    @classmethod
     def mouseDClick(cls, widget: PySide2.QtWidgets.QWidget, button: PySide2.QtCore.Qt.MouseButton, stateKey: typing.Union[PySide2.QtCore.Qt.KeyboardModifiers,PySide2.QtCore.Qt.KeyboardModifier] = ..., pos: PySide2.QtCore.QPoint = ..., delay: int = ...) -> None: ...
-    @classmethod
     @overload
+    @classmethod
     def mouseDClick(cls, window: PySide2.QtGui.QWindow, button: PySide2.QtCore.Qt.MouseButton, stateKey: typing.Union[PySide2.QtCore.Qt.KeyboardModifiers,PySide2.QtCore.Qt.KeyboardModifier] = ..., pos: PySide2.QtCore.QPoint = ..., delay: int = ...) -> None: ...
-    @classmethod
     @overload
+    @classmethod
     def mouseEvent(cls, action: QTest.MouseAction, widget: PySide2.QtWidgets.QWidget, button: PySide2.QtCore.Qt.MouseButton, stateKey: typing.Union[PySide2.QtCore.Qt.KeyboardModifiers,PySide2.QtCore.Qt.KeyboardModifier], pos: PySide2.QtCore.QPoint, delay: int = ...) -> None: ...
-    @classmethod
     @overload
+    @classmethod
     def mouseEvent(cls, action: QTest.MouseAction, window: PySide2.QtGui.QWindow, button: PySide2.QtCore.Qt.MouseButton, stateKey: typing.Union[PySide2.QtCore.Qt.KeyboardModifiers,PySide2.QtCore.Qt.KeyboardModifier], pos: PySide2.QtCore.QPoint, delay: int = ...) -> None: ...
-    @classmethod
     @overload
+    @classmethod
     def mouseMove(cls, widget: PySide2.QtWidgets.QWidget, pos: PySide2.QtCore.QPoint = ..., delay: int = ...) -> None: ...
-    @classmethod
     @overload
+    @classmethod
     def mouseMove(cls, window: PySide2.QtGui.QWindow, pos: PySide2.QtCore.QPoint = ..., delay: int = ...) -> None: ...
-    @classmethod
     @overload
+    @classmethod
     def mousePress(cls, widget: PySide2.QtWidgets.QWidget, button: PySide2.QtCore.Qt.MouseButton, stateKey: typing.Union[PySide2.QtCore.Qt.KeyboardModifiers,PySide2.QtCore.Qt.KeyboardModifier] = ..., pos: PySide2.QtCore.QPoint = ..., delay: int = ...) -> None: ...
-    @classmethod
     @overload
+    @classmethod
     def mousePress(cls, window: PySide2.QtGui.QWindow, button: PySide2.QtCore.Qt.MouseButton, stateKey: typing.Union[PySide2.QtCore.Qt.KeyboardModifiers,PySide2.QtCore.Qt.KeyboardModifier] = ..., pos: PySide2.QtCore.QPoint = ..., delay: int = ...) -> None: ...
-    @classmethod
     @overload
+    @classmethod
     def mouseRelease(cls, widget: PySide2.QtWidgets.QWidget, button: PySide2.QtCore.Qt.MouseButton, stateKey: typing.Union[PySide2.QtCore.Qt.KeyboardModifiers,PySide2.QtCore.Qt.KeyboardModifier] = ..., pos: PySide2.QtCore.QPoint = ..., delay: int = ...) -> None: ...
-    @classmethod
     @overload
+    @classmethod
     def mouseRelease(cls, window: PySide2.QtGui.QWindow, button: PySide2.QtCore.Qt.MouseButton, stateKey: typing.Union[PySide2.QtCore.Qt.KeyboardModifiers,PySide2.QtCore.Qt.KeyboardModifier] = ..., pos: PySide2.QtCore.QPoint = ..., delay: int = ...) -> None: ...
     @classmethod
     def qCleanup(cls) -> None: ...
@@ -351,11 +351,11 @@ class QTest(shiboken2.Object):
     def qElementData(cls, elementName: bytes, metaTypeId: int) -> int: ...
     @classmethod
     def qExpectFail(cls, dataIndex: bytes, comment: bytes, mode: QTest.TestFailMode, file: bytes, line: int) -> bool: ...
-    @classmethod
     @overload
+    @classmethod
     def qFindTestData(cls, basepath: str, file: typing.Union[bytes,None] = ..., line: int = ..., builddir: typing.Union[bytes,None] = ...) -> str: ...
-    @classmethod
     @overload
+    @classmethod
     def qFindTestData(cls, basepath: bytes, file: typing.Union[bytes,None] = ..., line: int = ..., builddir: typing.Union[bytes,None] = ...) -> str: ...
     @classmethod
     def qGlobalData(cls, tagName: bytes, typeId: int) -> int: ...
@@ -367,35 +367,35 @@ class QTest(shiboken2.Object):
     def qWaitForWindowActive(cls, widget: PySide2.QtWidgets.QWidget, timeout: int = ...) -> bool: ...
     @classmethod
     def qWaitForWindowExposed(cls, widget: PySide2.QtWidgets.QWidget, timeout: int = ...) -> bool: ...
-    @classmethod
     @overload
+    @classmethod
     def sendKeyEvent(cls, action: QTest.KeyAction, widget: PySide2.QtWidgets.QWidget, code: PySide2.QtCore.Qt.Key, ascii: int, modifier: typing.Union[PySide2.QtCore.Qt.KeyboardModifiers,PySide2.QtCore.Qt.KeyboardModifier], delay: int = ...) -> None: ...
-    @classmethod
     @overload
+    @classmethod
     def sendKeyEvent(cls, action: QTest.KeyAction, widget: PySide2.QtWidgets.QWidget, code: PySide2.QtCore.Qt.Key, text: str, modifier: typing.Union[PySide2.QtCore.Qt.KeyboardModifiers,PySide2.QtCore.Qt.KeyboardModifier], delay: int = ...) -> None: ...
-    @classmethod
     @overload
+    @classmethod
     def sendKeyEvent(cls, action: QTest.KeyAction, window: PySide2.QtGui.QWindow, code: PySide2.QtCore.Qt.Key, ascii: int, modifier: typing.Union[PySide2.QtCore.Qt.KeyboardModifiers,PySide2.QtCore.Qt.KeyboardModifier], delay: int = ...) -> None: ...
-    @classmethod
     @overload
+    @classmethod
     def sendKeyEvent(cls, action: QTest.KeyAction, window: PySide2.QtGui.QWindow, code: PySide2.QtCore.Qt.Key, text: str, modifier: typing.Union[PySide2.QtCore.Qt.KeyboardModifiers,PySide2.QtCore.Qt.KeyboardModifier], delay: int = ...) -> None: ...
     @classmethod
     def setBenchmarkResult(cls, result: float, metric: QTest.QBenchmarkMetric) -> None: ...
     @classmethod
     def setMainSourcePath(cls, file: bytes, builddir: typing.Union[bytes,None] = ...) -> None: ...
-    @classmethod
     @overload
+    @classmethod
     def simulateEvent(cls, widget: PySide2.QtWidgets.QWidget, press: bool, code: int, modifier: typing.Union[PySide2.QtCore.Qt.KeyboardModifiers,PySide2.QtCore.Qt.KeyboardModifier], text: str, repeat: bool, delay: int = ...) -> None: ...
-    @classmethod
     @overload
+    @classmethod
     def simulateEvent(cls, window: PySide2.QtGui.QWindow, press: bool, code: int, modifier: typing.Union[PySide2.QtCore.Qt.KeyboardModifiers,PySide2.QtCore.Qt.KeyboardModifier], text: str, repeat: bool, delay: int = ...) -> None: ...
     @classmethod
     def testObject(cls) -> PySide2.QtCore.QObject: ...
     @classmethod
     def toPrettyCString(cls, unicode: bytes, length: int) -> bytes: ...
-    @classmethod
     @overload
+    @classmethod
     def touchEvent(cls, widget: PySide2.QtWidgets.QWidget, device: PySide2.QtGui.QTouchDevice, autoCommit: bool = ...) -> QTest.QTouchEventSequence: ...
-    @classmethod
     @overload
+    @classmethod
     def touchEvent(cls, window: PySide2.QtGui.QWindow, device: PySide2.QtGui.QTouchDevice, autoCommit: bool = ...) -> QTest.QTouchEventSequence: ...

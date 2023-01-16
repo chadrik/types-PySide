@@ -2,7 +2,12 @@ from __future__ import absolute_import, print_function
 
 from typing import Any, List, ClassVar, cast, overload
 
+import pytest
+
+import PySide2
 from PySide2 import QtCore, QtGui, QtWidgets, QtQuick
+
+pyside_version = PySide2.__version_info__
 
 
 def test_qapplication():
@@ -19,6 +24,7 @@ def test_qaction():
     a.setShortcut("Ctrl+F")
 
 
+@pytest.mark.skipif(pyside_version <= (5, 14), reason="causes crash in PySide2 < 5.14.2.3")
 def test_qbytearray():
     byte_array = QtCore.QByteArray(b'foo')
     b: bytes
@@ -382,8 +388,9 @@ def test_qtreewidgetitem():
 
     b = True  # type: bool
     b = t < t
-    b = t == t
-    b = t != t
+    if pyside_version >= (5, 15, 0):
+        b = t == t
+        b = t != t
 
     t.setForeground(3, QtGui.QColor(QtCore.Qt.red))
     t.setBackground(3, QtGui.QColor(QtCore.Qt.red))
@@ -455,6 +462,7 @@ def test_qbrush_implicit_args():
     painter.setBrush(QtCore.Qt.GlobalColor.black)
 
 
+@pytest.mark.skipif(pyside_version < (5, 14), reason="fails in PySide2 < 5.14.2.3")
 def test_iterability():
     # works with list or iterator
     option1 = QtCore.QCommandLineOption(['one', 'won'])

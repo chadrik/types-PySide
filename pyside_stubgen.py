@@ -9,12 +9,8 @@ from functools import lru_cache, total_ordering
 from types import ModuleType
 from typing import Any, List, Optional, Iterable, Mapping, NamedTuple, Tuple, Union
 
-import mypy.fastparse
-import mypy.nodes
-import mypy.stubdoc
 import mypy.stubgen
 import mypy.stubgenc
-import mypy.types
 from mypy.stubgenc import get_type_fullname
 
 from PySide2 import QtCore, QtWidgets
@@ -32,7 +28,6 @@ _orig_get_members = mypy.stubgenc.get_members
 
 # TODO: support PySide6
 PYSIDE = 'PySide2'
-
 
 Optionality = NamedTuple(
     'Optionality', [('accepts_none', bool), ('has_default', bool)])
@@ -203,7 +198,7 @@ def short_name(type_name: str) -> str:
     return type_name.split('.')[-1]
 
 
-def is_redundant_overload(sig: mypy.stubgenc.FunctionSig, sigs: List[mypy.stubgenc.FunctionSig]):
+def is_redundant_overload(sig: mypy.stubgenc.FunctionSig, sigs: List[mypy.stubgenc.FunctionSig]) -> bool:
     """
     Return whether an overload is fully covered by another overload, and thus redundant.
     """
@@ -262,8 +257,8 @@ ANY = None
 class PySideSignatureGenerator(mypy.stubgenc.SignatureGenerator):
     docstring = mypy.stubgenc.DocstringSignatureGenerator()
 
-    # Complete signature replacements.
-    # The class name can be None, in which case it will match
+    # Full signature replacements.
+    # The class name can be ANY, in which case it will match any class
     _signature_overrides = {
         # these docstring sigs are malformed
         ('VolatileBool', 'get'):
@@ -443,6 +438,7 @@ class PySideSignatureGenerator(mypy.stubgenc.SignatureGenerator):
             ['PySide2.QtCore.QEasingCurve.Type'],
     }
 
+    # Specific argument overrides
     _arg_type_overrides = {
         # (class, method, arg, type)
         (ANY, ANY, 'flags', 'int'): 'typing.SupportsInt',
@@ -497,6 +493,7 @@ class PySideSignatureGenerator(mypy.stubgenc.SignatureGenerator):
     }
 
     def __init__(self):
+        # insert OptionalKeys
         self.signature_overrides = {
             (OptionalKey(key[0]),) + key[1:]: value
             for key, value in self._signature_overrides.items()
@@ -524,9 +521,8 @@ class PySideSignatureGenerator(mypy.stubgenc.SignatureGenerator):
                          ) -> Optional[List[mypy.stubgenc.FunctionSig]]:
         pass
 
-    def get_method_sig(self, func: object, module_name: str, class_name: str, name: str,
+    def get_method_sig(self, typ: type, func: object, module_name: str, class_name: str, name: str,
                        self_var: str) -> Optional[List[mypy.stubgenc.FunctionSig]]:
-        typ = getattr(func, '__objclass__', None)
         docstr = None
         is_flag_type = False
         if typ is not None and (is_flag(typ) or is_flag_group(typ) or is_flag_item(typ)):
@@ -538,6 +534,7 @@ class PySideSignatureGenerator(mypy.stubgenc.SignatureGenerator):
                 else:
                     return_type = typ
                 docstr = docstr.format(mypy.stubgenc.get_type_fullname(return_type))
+
         if not docstr:
             docstr = self.signature_overrides.get((OptionalKey(class_name), name))
 
@@ -550,7 +547,7 @@ class PySideSignatureGenerator(mypy.stubgenc.SignatureGenerator):
             results = mypy.stubgenc.infer_sig_from_docstring(docstr, name)
         else:
             # call the standard docstring-based generator
-            results = self.docstring.get_method_sig(func, module_name, class_name, name, self_var)
+            results = self.docstring.get_method_sig(typ, func, module_name, class_name, name, self_var)
 
         if not is_flag_type and results:
 
@@ -611,6 +608,8 @@ def get_sig_generators(doc_dir: str) -> List[mypy.stubgenc.SignatureGenerator]:
 
 
 def is_skipped_attribute(attr: str, value: Any) -> bool:
+    if not attr.isidentifier():
+        return True
     # these are unecesssary
     if attr in ('__delattr__', '__setattr__', '__reduce__'):
         return True
@@ -618,7 +617,7 @@ def is_skipped_attribute(attr: str, value: Any) -> bool:
     # to handle this.  are these objects hashable?
     if attr == '__hash__' and value is None:
         return True
-    return _orig_is_skipped_attribute(attr, value)
+    return False
 
 
 def is_c_method(obj: object) -> bool:
@@ -661,7 +660,7 @@ def walk_objects(obj, seen):
 
 
 def get_members(obj: Union[type, ModuleType]) -> List[Tuple[str, Any]]:
-    members = _orig_get_members(obj)
+    members = [x for x in _orig_get_members(obj) if not is_skipped_attribute(x[0], x[1])]
     if isinstance(obj, type):
         return members + PySideSignatureGenerator.new_members.get(obj.__name__, [])
     return members
@@ -689,7 +688,7 @@ def add_typing_import(output: List[str]) -> List[str]:
     return output
 
 
-mypy.stubgenc.is_skipped_attribute = is_skipped_attribute
+# mypy.stubgenc.is_skipped_attribute = is_skipped_attribute
 mypy.stubgenc.is_c_method = is_c_method
 mypy.stubgenc.strip_or_import = strip_or_import
 mypy.stubgen.get_sig_generators = get_sig_generators

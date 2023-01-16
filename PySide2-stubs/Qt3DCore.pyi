@@ -527,23 +527,23 @@ class Qt3DCore(shiboken2.Object):
         def __init__(self, parent: typing.Union[Qt3DCore.QNode,None] = ..., addedToEntity: typing.Callable = ..., defaultPropertyTrackingMode: Qt3DCore.QTransform.PropertyTrackingMode = ..., defaultPropertyTrackingModeChanged: typing.Callable = ..., destroyed: typing.Callable = ..., enabled: bool = ..., enabledChanged: typing.Callable = ..., isShareable: bool = ..., matrix: PySide2.QtGui.QMatrix4x4 = ..., matrixChanged: typing.Callable = ..., nodeDestroyed: typing.Callable = ..., objectName: str = ..., objectNameChanged: typing.Callable = ..., parentChanged: typing.Callable = ..., removedFromEntity: typing.Callable = ..., rotation: PySide2.QtGui.QQuaternion = ..., rotationChanged: typing.Callable = ..., rotationX: float = ..., rotationXChanged: typing.Callable = ..., rotationY: float = ..., rotationYChanged: typing.Callable = ..., rotationZ: float = ..., rotationZChanged: typing.Callable = ..., scale: float = ..., scale3D: PySide2.QtGui.QVector3D = ..., scale3DChanged: typing.Callable = ..., scaleChanged: typing.Callable = ..., shareableChanged: typing.Callable = ..., translation: PySide2.QtGui.QVector3D = ..., translationChanged: typing.Callable = ..., worldMatrix: PySide2.QtGui.QMatrix4x4 = ..., worldMatrixChanged: typing.Callable = ...) -> None: ...
         @classmethod
         def fromAxes(cls, xAxis: PySide2.QtGui.QVector3D, yAxis: PySide2.QtGui.QVector3D, zAxis: PySide2.QtGui.QVector3D) -> PySide2.QtGui.QQuaternion: ...
-        @classmethod
         @overload
+        @classmethod
         def fromAxesAndAngles(cls, axis1: PySide2.QtGui.QVector3D, angle1: float, axis2: PySide2.QtGui.QVector3D, angle2: float) -> PySide2.QtGui.QQuaternion: ...
-        @classmethod
         @overload
+        @classmethod
         def fromAxesAndAngles(cls, axis1: PySide2.QtGui.QVector3D, angle1: float, axis2: PySide2.QtGui.QVector3D, angle2: float, axis3: PySide2.QtGui.QVector3D, angle3: float) -> PySide2.QtGui.QQuaternion: ...
-        @classmethod
         @overload
+        @classmethod
         def fromAxisAndAngle(cls, axis: PySide2.QtGui.QVector3D, angle: float) -> PySide2.QtGui.QQuaternion: ...
-        @classmethod
         @overload
+        @classmethod
         def fromAxisAndAngle(cls, x: float, y: float, z: float, angle: float) -> PySide2.QtGui.QQuaternion: ...
-        @classmethod
         @overload
+        @classmethod
         def fromEulerAngles(cls, eulerAngles: PySide2.QtGui.QVector3D) -> PySide2.QtGui.QQuaternion: ...
-        @classmethod
         @overload
+        @classmethod
         def fromEulerAngles(cls, pitch: float, yaw: float, roll: float) -> PySide2.QtGui.QQuaternion: ...
         def matrix(self) -> PySide2.QtGui.QMatrix4x4: ...
         @classmethod

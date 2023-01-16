@@ -31,9 +31,9 @@ In the process of creating these stubs I made a bunch of improvements to mypy's 
   * e.g. `myobject.mysignal.connect(func)` and `myobject.mysignal[type].connect(func)`
   * Fixed slot arg of `SignalInstance.connect()` to be `typing.Callable` instead of `object`
   * Fixed `Signal.emit()`
-  * Fixed `Signal.connect()` return value to bool instead of None
+  * Fixed `Signal.connect()` return value to `bool` instead of `None`
   * Fixed `Object.disconnect()`
-* Fixed flag classes to Aad all methods: `__or__`, `__xor__`, ...
+* Fixed flag classes to add all methods: `__or__`, `__xor__`, ...
 
 ### Rule-based fixes
 
@@ -96,6 +96,14 @@ Note, you may need to uninstall other PySide2 stubs first:
 ## Help improve the stubs
 
 If you notice incorrect or missing typing information (i.e. mypy reports errors even though your code is correct), please report it or make a PR to fix it. 
+
+## Testing
+
+```
+python3 -m venv .venv
+. .venv/bin/activate
+tox
+```
 
 ## TODO
 
