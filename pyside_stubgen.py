@@ -311,6 +311,8 @@ class PySideSignatureGenerator(mypy.stubgenc.SignatureGenerator):
                 '(cls, arg__1: PySide2.QtCore.QMetaObject.Connection) -> bool',
                 '(cls, sender: PySide2.QtCore.QObject, signal: PySide2.QtCore.QMetaMethod, receiver: PySide2.QtCore.QObject = ..., member: PySide2.QtCore.QMetaMethod = ...) -> bool',
             ],
+        ('QWidget', 'setParent'):
+            '(self, parent: typing.Union[PySide2.QtCore.QObject,None], f: PySide2.QtCore.Qt.WindowFlags = ...) -> None',
         # * Correct numerous annotations from `bytes` to `str`
         ('QObject', 'setProperty'):
             '(self, name: str, value: typing.Any) -> bool',
@@ -380,9 +382,12 @@ class PySideSignatureGenerator(mypy.stubgenc.SignatureGenerator):
             '(self, alignment: PySide*.QtCore.Qt.Alignment) -> None',
         ('QFrame', 'setFrameStyle'):
             '(self, arg__1: typing.Union[PySide*.QtWidgets.QFrame.Shape, PySide*.QtWidgets.QFrame.Shadow, typing.SupportsInt]) -> None',
+
+        # in PySide2 these take int, and in PySide6 it takes Weight, but both seem valid
         ('QFont', 'setWeight'):
-            # in PySide2 this takes int, and in PySide6 it takes Weight, but both seem valid
             '(self, arg__1: typing.Union[int, PySide*.QtGui.QFont.Weight]) -> None',
+        ('QTextEdit', 'setFontWeight'):
+            '(self, w: typing.Union[int, PySide*.QtGui.QFont.Weight]) -> None',
         # ('QFont', 'weight'): pyside('(self) -> PySide*.QtGui.QFont.Weight'),  # fixed in PySide6
 
         # * Fix arguments that accept `QModelIndex` which were typed as `int` in many places
@@ -448,7 +453,8 @@ class PySideSignatureGenerator(mypy.stubgenc.SignatureGenerator):
         'PySide2.QtGui.QKeySequence':
             ['str'],
         'PySide2.QtGui.QColor':
-            ['PySide2.QtCore.Qt.GlobalColor'],
+            ['PySide2.QtCore.Qt.GlobalColor',
+             'int'],
         'PySide2.QtCore.QByteArray':
             ['bytes'],
         'PySide2.QtGui.QBrush':
@@ -542,7 +548,10 @@ class PySideSignatureGenerator(mypy.stubgenc.SignatureGenerator):
 
     def get_function_sig(self, func: object, module_name: str, name: str
                          ) -> Optional[List[mypy.stubgenc.FunctionSig]]:
-        pass
+        if name == 'qVersion':
+            return [mypy.stubgenc.FunctionSig('qVersion', [], 'str')]
+        else:
+            return None
 
     def get_method_sig(self, typ: type, func: object, module_name: str, class_name: str, name: str,
                        self_var: str) -> Optional[List[mypy.stubgenc.FunctionSig]]:

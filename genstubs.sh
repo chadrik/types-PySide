@@ -8,6 +8,8 @@ POINT_RELEASE=0
 python -m pyside_stubgen -p shiboken2 -p PySide2 -o ./.build
 
 echo -e "\nclass Object:\n    pass" >> ./.build/shiboken2/shiboken2.pyi
+echo -e "__version__: str" >> ./.build/PySide2/__init__.pyi
+echo -e "__version_info__: tuple[int, int, float, str, str]" >> ./.build/PySide2/__init__.pyi
 
 rm -rf ./PySide2-stubs
 mv ./.build/PySide2 ./PySide2-stubs

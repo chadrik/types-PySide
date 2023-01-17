@@ -50,7 +50,7 @@ In the process of creating these stubs I made a bunch of improvements to mypy's 
 
 * Certain argument types implicitly accept alternative types for brevity.  Below are the known fixes so far (Note that I've debated not including these, since one of the advantages of static typing is it gives you the confidence to be explicit rather than ambiguous. I could introduce a strict mode in the future that would disable these):
   * `QKeySequence`: `str`
-  * `QColor`: `Qt.GlobalColor`
+  * `QColor`: `Qt.GlobalColor` and `int`
   * `QBrush`: `QLinearGradient` and `QColor` (and by extension `Qt.GlobalColor`)
   * `QCursor`: `Qt.CursorShape`
   * `QEasingCurve`: `QEasingCurve.Type`
@@ -77,6 +77,8 @@ In the process of creating these stubs I made a bunch of improvements to mypy's 
 * Fixed support for `bytes(QByteArray(b'foo'))`
 * Added support for all `QSize` and `QSizeF` operations
 * Added support for all `QPolygon` operations
+* Fixed `QTextEdit.setFontWeight()` to accept `QFont.Weight`
+* Fixed return type for `qVersion()`
 
 ## Licensing
 As a derived work from PySide2, the stubs are delivered under the LGPL v2.1 . See file LICENSE for more details.

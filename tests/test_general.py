@@ -233,7 +233,10 @@ def test_qpainter():
 def test_qpixmap():
     emptyPixmap = QtGui.QPixmap(16, 16)
     emptyPixmap.fill(QtCore.Qt.transparent)
-    emptyPixmap.fill("white")
+    # we currenly choose not to allow str literals because it is too ambiguous.
+    # use constants to enforce proper types
+    # emptyPixmap.fill("white")
+    emptyPixmap.fill(QtCore.Qt.GlobalColor.white)
     emptyPixmap.fill(0xFFFFFF)
 
 
@@ -496,3 +499,8 @@ def test_iterability():
     group = QtWidgets.QListWidget()
     group.addItems(iter(['one', 'two', 'three']))
     assert combo.count() == 3
+
+
+def test_fonts():
+    w = QtWidgets.QTextEdit()
+    w.setFontWeight(QtGui.QFont.DemiBold)

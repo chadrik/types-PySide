@@ -43,3 +43,5 @@
 #   QtWidgets
 #   QtXml
 #   QtXmlPatterns
+__version__: str
+__version_info__: tuple[int, int, float, str, str]
