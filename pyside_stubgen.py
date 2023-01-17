@@ -2,6 +2,7 @@ from __future__ import absolute_import, print_function
 
 import importlib
 import inspect
+import itertools
 import pydoc
 import re
 import typing
@@ -198,23 +199,45 @@ def short_name(type_name: str) -> str:
     return type_name.split('.')[-1]
 
 
-def is_redundant_overload(sig: mypy.stubgenc.FunctionSig, sigs: List[mypy.stubgenc.FunctionSig]) -> bool:
+def reduce_overloads(sigs: List[mypy.stubgenc.FunctionSig]) -> List[mypy.stubgenc.FunctionSig]:
+    # remove dups (FunctionSig is not hashable, so it's a bit cumbersome)
+    new_sigs = []
+    for sig in sigs:
+        if sig not in new_sigs:
+            new_sigs.append(sig)
+    if len(new_sigs) <= 1:
+        return new_sigs
+    sigs = sorted(new_sigs, key=lambda x: len(x.args), reverse=True)
+    redundant = []
+    for a, b in itertools.combinations(sigs, 2):
+        if contains_other_overload(a, b):
+            redundant.append(b)
+        elif contains_other_overload(b, a):
+            redundant.append(a)
+    results = [sig for sig in sigs if sig not in redundant]
+    if not results:
+        print("removed too much")
+        for x in sigs:
+            print(x)
+        raise ValueError
+    return results
+
+
+def contains_other_overload(sig: mypy.stubgenc.FunctionSig,
+                            other: mypy.stubgenc.FunctionSig) -> bool:
     """
     Return whether an overload is fully covered by another overload, and thus redundant.
     """
-    if len(sigs) <= 1:
+    if other.ret_type != sig.ret_type:
+        # not compatible
         return False
-
-    num_args = len(sig.args)
-    # sort from longest to shortest
-    sigs = sorted(sigs, key=lambda x: len(x.args), reverse=True)
-    for other in sigs:
-        if len(other.args) <= num_args:
-            # everyting after this has the same or fewer args
-            break
-        if other.args[:num_args] == sig.args and all(a.default for a in other.args[num_args:]) \
-                and other.ret_type == sig.ret_type:
-            return True
+    num_other_args = len(other.args)
+    if len(sig.args) < num_other_args:
+        # other has more args, sig cannot contain other
+        return False
+    if sig.args[:num_other_args] == other.args and all(a.default for a in sig.args[num_other_args:]):
+        # sig contains all of other's args, and the remaining sig args all have defaults
+        return True
     return False
 
 
@@ -550,9 +573,8 @@ class PySideSignatureGenerator(mypy.stubgenc.SignatureGenerator):
             results = self.docstring.get_method_sig(typ, func, module_name, class_name, name, self_var)
 
         if not is_flag_type and results:
+            results = reduce_overloads(results)
 
-            # FIXME: make this more efficient: don't check the same combinations twice
-            results = [x for x in results if not is_redundant_overload(x, results)]
             if typ and name == '__init__':
                 add_property_args(typ, results)
 
