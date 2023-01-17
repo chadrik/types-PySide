@@ -3,7 +3,7 @@ set -e
 
 POINT_RELEASE=1
 
-# pip install -U git+https://github.com/chadrik/mypy@stubgenc-improvements1#mypy
+pip install -U git+https://github.com/chadrik/mypy@stubgenc-all-fixes#mypy
 
 python -m pyside_stubgen -p shiboken2 -p PySide2 -o ./.build
 
