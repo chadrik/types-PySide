@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-POINT_RELEASE=1
+POINT_RELEASE=2
 
 pip install -U git+https://github.com/chadrik/mypy@stubgenc-all-fixes#mypy
 
