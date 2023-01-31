@@ -1,7 +1,7 @@
 
 # Type stubs for PySide2 (and soon PySide6)
 
-The most accurate type stubs for PySide! They have been tested against a code base with many thousands of lines of PySide code.
+The most accurate type stubs for PySide! They have been tested using `mypy` on a code base with many thousands of lines of PySide code.
 
 ## Comparison to other PySide stubs
 
@@ -14,13 +14,11 @@ I tried a number of projects before deciding to create my own.  Here's my super-
 | [PySide2-stubs](https://pypi.org/project/PySide2-stubs/)             | Reprocesses official stubs using [libcst](https://libcst.readthedocs.io/en/latest/) | better   |
 | [types-PySide2](https://pypi.org/project/types-PySide2/)             | Uses mypy's [stubgen](https://mypy.readthedocs.io/en/stable/stubgen.html)         | best     |
 
-`python-qt-tools/PySide2-stubs` is pretty good, but it still produced hundreds of errors in our code base.
-One thing I really like about the project, however, is the set of tests that serves to both demonstrate PySide runtime behavior _and_ prove that the stubs are accurate, so I've heavily borrowed from that. 
+[PySide2-stubs](https://pypi.org/project/PySide2-stubs/) is pretty good, but it still produced hundreds of errors in our code base.
 I considered contributing new features to that project, but the approach of using an AST/CST parser to modify
 an upstream set of bad official stubs to make them good is convoluted and prone to errors from upstream changes.
 This project uses mypy's official `stubgen` tool to directly generate stubs, with a set of corrections applied.
-Corrections are primarily defined through a dictionaries that map classes/methods/args to fixes which are applied during stub generation.
-In the process of creating these stubs I made a bunch of improvements to mypy's `stubgen` tool which should benefit me and other stub creators in the future, rather than persisting and working around PySide's own mediocre `PySide2.support.generate_pyi` tool.
+
 
 ## Features and fixes
 
@@ -37,10 +35,12 @@ In the process of creating these stubs I made a bunch of improvements to mypy's 
 
 ### Rule-based fixes
 
-* When instantiating subclasses of `QObject` it is possible to pass the values of properties and signals as `**kwargs` to `__init__`.  The stubs have been fix to include these on all relevant `__init__` methods.
+* When instantiating subclasses of `QObject` it is possible to pass the values of properties and signals as `**kwargs` to `__init__`.  The stubs have been fix to include these args on all relevant `__init__` methods.
 * Qt/PySide has special "flag" enumerator classes that work as pairs: one represents a single flag value, while the other represents multiple combined.  The stubs have been fix to allow either type of flag -- single or multiple -- anywhere that one of the would have been accepted, which is the correct behavior (technically `typing.SupportsInt` is the most correct, but using this would undermine the type enforcement provided by the stubs).
 * Removed redundant overlapping overloads, so that satisfying mypy/liskov on subclassed methods is easier 
-* Fixed all arguments typed as `typing.Sequence` to be `typing.Iterable`.  Tests so far have indicated that this is true as a general rule.  Also note that unlike other projects, `typing.Iterable` includes the subtype, e.g. `typing.Iterable[str]`
+* For methods that implement both classmethod and instancemethod overloads, the classmethod overloads have been removed.  Unfortunately, mypy disallows mixing these and does not correctly analyze them.
+* Fixed all arguments typed as `typing.Sequence` to be `typing.Iterable`.  Tests so far have indicated that this is true as a general rule. 
+* Added the sub-type to `typing.Iterable` annotations, e.g. `typing.Iterable[str]`
 * Replaced `object` with `typing.Any` in return types. e.g.:
   * `QSettings.value() -> Any`
   * `QModelIndex.internalPointer() -> Any`
@@ -81,6 +81,7 @@ In the process of creating these stubs I made a bunch of improvements to mypy's 
 * Fixed return type for `qVersion()`
 
 ## Licensing
+
 As a derived work from PySide2, the stubs are delivered under the LGPL v2.1 . See file LICENSE for more details.
 
 ## Installation
@@ -89,7 +90,9 @@ Install the latest stub packages from pypi:
 
     $ pip install types-PySide2
 
-This will add the `PySide2-stubs` and `shiboken2-stubs` packages into your site-packages directory. 
+This will add the `PySide2-stubs` and `shiboken2-stubs` packages into your site-packages directory.  
+Yes, the name of the pypi package is `types-PySide2` but the python package it installs is `PySide2-stubs`.  
+It's confusing, but [PEP 561](https://peps.python.org/pep-0561/) requires that the installed package name is of the form `$PACKAGE-stubs`, so all of us PySide stub developers are installing a package with the same name.
 
 Note, you may need to uninstall other PySide2 stubs first:
 

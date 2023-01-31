@@ -200,13 +200,35 @@ def short_name(type_name: str) -> str:
 
 
 def reduce_overloads(sigs: List[mypy.stubgenc.FunctionSig]) -> List[mypy.stubgenc.FunctionSig]:
+    """
+    Remove unsupported and redundant overloads.
+
+    - Some overloads are a subset of other overloads and can be pruned.
+    - Some methods implement both classmethod and instancemethod overloads, and mypy prevents
+      mixing these and does not correctly analyze them: so we have to drop one, and we've chosen
+      to remove classmethods.  It is possible to implement a "universalmethod" decorator, but
+      we could not use overloads to distinguish their arguments.
+    """
     # remove dups (FunctionSig is not hashable, so it's a bit cumbersome)
     new_sigs = []
+    classmethods = []
+    instancmethods = []
     for sig in sigs:
         if sig not in new_sigs:
+            if sig.args and sig.args[0].name == 'self':
+                instancmethods.append(sig)
+            else:
+                classmethods.append(sig)
             new_sigs.append(sig)
+    if classmethods and instancmethods:
+        if sigs[0].name == 'moveToTrash':
+            print(classmethods)
+            print(instancmethods)
+        new_sigs = instancmethods
+
     if len(new_sigs) <= 1:
         return new_sigs
+
     sigs = sorted(new_sigs, key=lambda x: len(x.args), reverse=True)
     redundant = []
     for a, b in itertools.combinations(sigs, 2):
