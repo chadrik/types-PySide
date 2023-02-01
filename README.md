@@ -31,7 +31,7 @@ This project uses mypy's official `stubgen` tool to directly generate stubs, wit
   * Fixed `Signal.emit()`
   * Fixed `Signal.connect()` return value to `bool` instead of `None`
   * Fixed `Object.disconnect()`
-* Fixed flag classes to add all methods: `__or__`, `__xor__`, ...
+* Added all methods to flag classes: `__or__`, `__xor__`, ...
 
 ### Rule-based fixes
 
@@ -39,8 +39,8 @@ This project uses mypy's official `stubgen` tool to directly generate stubs, wit
 * Qt/PySide has special "flag" enumerator classes that work as pairs: one represents a single flag value, while the other represents multiple combined.  The stubs have been fix to allow either type of flag -- single or multiple -- anywhere that one of the would have been accepted, which is the correct behavior (technically `typing.SupportsInt` is the most correct, but using this would undermine the type enforcement provided by the stubs).
 * Removed redundant overlapping overloads, so that satisfying mypy/liskov on subclassed methods is easier 
 * For methods that implement both classmethod and instancemethod overloads, the classmethod overloads have been removed.  Unfortunately, mypy disallows mixing these and does not correctly analyze them.
-* Fixed all arguments typed as `typing.Sequence` to be `typing.Iterable`.  Tests so far have indicated that this is true as a general rule. 
-* Added the sub-type to `typing.Iterable` annotations, e.g. `typing.Iterable[str]`
+* Corrected all arguments typed as `typing.Sequence` to be `typing.Iterable`.  Tests so far have indicated that this is true as a general rule. 
+* Added sub-types to `Iterable` annotations, e.g. `Iterable[str]`,  `Iterable[int]`, etc
 * Replaced `object` with `typing.Any` in return types. e.g.:
   * `QSettings.value() -> Any`
   * `QModelIndex.internalPointer() -> Any`
