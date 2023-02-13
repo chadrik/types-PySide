@@ -2,4 +2,4 @@
 
 python3 -m pip install build
 rm -rf dist/*
-python3 -m build -w
+python3 -m build --wheel

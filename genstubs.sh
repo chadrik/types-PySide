@@ -1,9 +1,10 @@
 #!/bin/bash
 set -e
 
-POINT_RELEASE=2
+POINT_RELEASE=3
 
-pip install -U git+https://github.com/chadrik/mypy@stubgenc-all-fixes#mypy
+#pip install -U git+https://github.com/chadrik/mypy@stubgenc-all-fixes#mypy
+# pip install -U -e ../mypy
 
 python -m pyside_stubgen -p shiboken2 -p PySide2 -o ./.build
 
