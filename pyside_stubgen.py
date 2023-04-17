@@ -311,7 +311,8 @@ class PySideSignatureGenerator(mypy.stubgenc.SignatureGenerator):
         ('VolatileBool', 'set'):
             '(self, a: object) -> None',
 
-        # * Add all signals and make all new-style signal patterns work.  e.g. `myobject.mysignal.connect(func) and `myobject.mysignal[type].connect(func)`
+        # * Add all signals and make all new-style signal patterns work.  e.g.
+        # `myobject.mysignal.connect(func) and `myobject.mysignal[type].connect(func)`
         ('Signal', '__get__'):
             [
                 '(self, instance: None, owner: typing.Type[QObject]) -> Signal',
@@ -333,8 +334,10 @@ class PySideSignatureGenerator(mypy.stubgenc.SignatureGenerator):
                 '(cls, arg__1: PySide2.QtCore.QMetaObject.Connection) -> bool',
                 '(cls, sender: PySide2.QtCore.QObject, signal: PySide2.QtCore.QMetaMethod, receiver: PySide2.QtCore.QObject = ..., member: PySide2.QtCore.QMetaMethod = ...) -> bool',
             ],
+
         ('QWidget', 'setParent'):
             '(self, parent: typing.Union[PySide2.QtCore.QObject,None], f: PySide2.QtCore.Qt.WindowFlags = ...) -> None',
+
         # * Correct numerous annotations from `bytes` to `str`
         ('QObject', 'setProperty'):
             '(self, name: str, value: typing.Any) -> bool',
@@ -355,12 +358,12 @@ class PySideSignatureGenerator(mypy.stubgenc.SignatureGenerator):
             # Add result type
             '(self) -> QTreeWidgetItemIterator',
 
+        # * Make result optional
         ('QLayout', 'itemAt'):
-            # make result optional
             '(self, index: int) -> typing.Optional[PySide*.QtWidgets.QLayoutItem]',
         ('QLayout', 'takeAt'):
-            # make result optional
             '(self, index: int) -> typing.Optional[PySide*.QtWidgets.QLayoutItem]',
+
         # * Fix QPolygon special methods
         ('QPolygon', '__lshift__'):
             # first and third overloads should return QPolygon
@@ -377,10 +380,12 @@ class PySideSignatureGenerator(mypy.stubgenc.SignatureGenerator):
         ('QByteArray', '__getitem__'):
             # missing index and return.
             '(self, index: int) -> bytes',
+
         # * Fix `QByteArray.__iter__()` to iterate over `bytes`
         ('QByteArray', '__iter__'):
             # __iter__ is implied by __len__ and __getitem__, but it's not enough to satisfy mypy
             '(self) -> typing.Iterator[bytes]',
+
         # * Fix support for `bytes(QByteArray(b'foo'))`
         ('QByteArray', '__bytes__'):
             '(self) -> bytes',
@@ -432,6 +437,7 @@ class PySideSignatureGenerator(mypy.stubgenc.SignatureGenerator):
         # * Fix return type for `QApplication.instance()` and `QGuiApplication.instance()` :
         ('QCoreApplication', 'instance'):
             '(cls: typing.Type[T]) -> T',
+
         # * Fix return type for `QObject.findChild()` and `QObject.findChildren()` :
         ('QObject', 'findChild'):
             '(self, arg__1: typing.Type[T], arg__2: str = ...) -> T',
@@ -489,7 +495,7 @@ class PySideSignatureGenerator(mypy.stubgenc.SignatureGenerator):
             ['PySide2.QtCore.QEasingCurve.Type'],
     }
 
-    # Specific argument overrides
+    # Override argument types
     _arg_type_overrides = {
         # (class, method, arg, type)
         (ANY, ANY, 'flags', 'int'): 'typing.SupportsInt',
@@ -732,16 +738,14 @@ def generate_stub_for_c_module(module_name: str,
 
 
 def add_typing_import(output: List[str]) -> List[str]:
-    # we don't call the original function because we won't want the standard typing imports
-    # because `from tying import Any` causes conflicts in QtNetwork
-    # output = _orig_add_typing_import(output)
+    # we don't call the original function because we don't want the standard typing imports:
+    # `from tying import Any` causes conflicts in QtNetwork
     for i, line in enumerate(output):
         if line.startswith('import typing'):
             return output[:i] + [line, "T = typing.TypeVar('T')"] + output[i + 1:]
     return output
 
 
-# mypy.stubgenc.is_skipped_attribute = is_skipped_attribute
 mypy.stubgenc.is_c_method = is_c_method
 mypy.stubgenc.strip_or_import = strip_or_import
 mypy.stubgen.get_sig_generators = get_sig_generators
