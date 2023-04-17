@@ -360,6 +360,13 @@ def test_qsize():
     assert type(qsf3) == QtCore.QSizeF
 
 
+def test_qspaceritem():
+    # in PySide2 docs hPolicy and vPolicy are erroneously named hData and vData
+    s = QtWidgets.QSpacerItem(10, 20,
+                              hPolicy=QtWidgets.QSizePolicy.Expanding,
+                              vPolicy=QtWidgets.QSizePolicy.Expanding)
+
+
 def test_qsplitter():
     s = QtWidgets.QSplitter()
     b: QtCore.QByteArray

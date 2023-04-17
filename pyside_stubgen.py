@@ -505,6 +505,16 @@ class PySideSignatureGenerator(mypy.stubgenc.SignatureGenerator):
         (ANY, 'addAction', ANY, 'object'): 'typing.Callable[[], typing.Any]',
     }
 
+    # Find and replace argument names
+    _arg_name_replacements = {
+        # (class, method, arg)
+        # * Fix `QSpacerItem.__init__/changeSize` argument names: `hData`->`hPolicy`, `vData`->`vPolicy`
+        ('QSpacerItem', '__init__', 'hData', ANY): 'hPolicy',
+        ('QSpacerItem', '__init__', 'vData', ANY): 'vPolicy',
+        ('QSpacerItem', 'changeSize', 'hData', ANY): 'hPolicy',
+        ('QSpacerItem', 'changeSize', 'vData', ANY): 'vPolicy',
+    }
+
     # Values which should be made Optional[].
     _optional_args = {
         # (class, method, arg, type)
@@ -573,6 +583,10 @@ class PySideSignatureGenerator(mypy.stubgenc.SignatureGenerator):
                 'typing.Union[{},{},NoneType]'.format(orig, ','.join(alt))
             for orig, alt in self._implicit_arg_types.items()
         })
+        self.arg_name_replacements = {
+            tuple(OptionalKey(k) for k in key): pyside(value)
+            for key, value in self._arg_name_replacements.items()
+        }
 
     def get_function_sig(self, func: object, module_name: str, name: str
                          ) -> Optional[List[mypy.stubgenc.FunctionSig]]:
@@ -624,6 +638,10 @@ class PySideSignatureGenerator(mypy.stubgenc.SignatureGenerator):
                     arg.type = arg_type
 
                     key = tuple(OptionalKey(k) for k in [class_name, name, arg.name, arg_type])
+
+                    if key in self.arg_name_replacements:
+                        arg.name = self.arg_name_replacements[key]
+
                     if key in self.optional_args:
                         # use Union[{}, NoneType] so that further replacements can be
                         # made by implicit_arg_types

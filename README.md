@@ -79,6 +79,7 @@ This project uses mypy's official `stubgen` tool to directly generate stubs, wit
 * Added support for all `QPolygon` operations
 * Fixed `QTextEdit.setFontWeight()` to accept `QFont.Weight`
 * Fixed return type for `qVersion()`
+* Fix `QSpacerItem.__init__/changeSize` argument names: `hData`->`hPolicy`, `vData`->`vPolicy`
 
 ## Licensing
 
