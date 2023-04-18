@@ -361,10 +361,14 @@ def test_qsize():
 
 
 def test_qspaceritem():
-    # in PySide2 docs hPolicy and vPolicy are erroneously named hData and vData
+    # in C++ the size args are named hPolicy and vPolicy, but in PySide they
+    # renamed to hData and vData, but both are valid.
     s = QtWidgets.QSpacerItem(10, 20,
                               hPolicy=QtWidgets.QSizePolicy.Expanding,
                               vPolicy=QtWidgets.QSizePolicy.Expanding)
+    s = QtWidgets.QSpacerItem(10, 20,
+                              hData=QtWidgets.QSizePolicy.Expanding,
+                              vData=QtWidgets.QSizePolicy.Expanding)
 
 
 def test_qsplitter():

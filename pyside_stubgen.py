@@ -507,12 +507,7 @@ class PySideSignatureGenerator(mypy.stubgenc.SignatureGenerator):
 
     # Find and replace argument names
     _arg_name_replacements = {
-        # (class, method, arg)
-        # * Fix `QSpacerItem.__init__/changeSize` argument names: `hData`->`hPolicy`, `vData`->`vPolicy`
-        ('QSpacerItem', '__init__', 'hData', ANY): 'hPolicy',
-        ('QSpacerItem', '__init__', 'vData', ANY): 'vPolicy',
-        ('QSpacerItem', 'changeSize', 'hData', ANY): 'hPolicy',
-        ('QSpacerItem', 'changeSize', 'vData', ANY): 'vPolicy',
+        # (class, method, arg, type)
     }
 
     # Values which should be made Optional[].
@@ -544,6 +539,12 @@ class PySideSignatureGenerator(mypy.stubgenc.SignatureGenerator):
         # * Fix support for initializing `QDateTime` from `datetime.datetime`
         ('QDateTime', '__init__'):
             '(self, datetime: datetime.datetime) -> None',
+
+        # * Add `QSpacerItem.__init__/changeSize` overloads that use alternate names: `hData`->`hPolicy`, `vData`->`vPolicy`
+        ('QSpacerItem', '__init__'):
+            '(self, w:int, h:int, hPolicy:PySide2.QtWidgets.QSizePolicy.Policy=..., vPolicy:PySide2.QtWidgets.QSizePolicy.Policy=...) -> None',
+        ('QSpacerItem', 'changeSize'):
+            '(self, w:int, h:int, hPolicy:PySide2.QtWidgets.QSizePolicy.Policy=..., vPolicy:PySide2.QtWidgets.QSizePolicy.Policy=...) -> None',
     }
 
     new_members = {

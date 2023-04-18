@@ -79,7 +79,7 @@ This project uses mypy's official `stubgen` tool to directly generate stubs, wit
 * Added support for all `QPolygon` operations
 * Fixed `QTextEdit.setFontWeight()` to accept `QFont.Weight`
 * Fixed return type for `qVersion()`
-* Fix `QSpacerItem.__init__/changeSize` argument names: `hData`->`hPolicy`, `vData`->`vPolicy`
+* Add `QSpacerItem.__init__/changeSize` overloads that use alternate names: `hData`->`hPolicy`, `vData`->`vPolicy`
 
 ## Licensing
 
@@ -113,7 +113,6 @@ tox
 
 ## TODO
 
-* Get all my stubgen changes merged into mypy
 * Build PySide6 stubs
 * Merge overloads where a `Union` would do instead of multiple overloads
 * Add type enforcement for signal types, to protect against incorrect callables provided to `connect()`
