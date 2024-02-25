@@ -1,7 +1,5 @@
 
-This project has moved to https://github.com/LumaPictures/cg-stubs
+# This project has moved
 
-# Type stubs for PySide2 (and soon PySide6)
-
-The most accurate type stubs for PySide! They have been tested using `mypy` on a code base with many thousands of lines of PySide code.
+It has been combined with other typing efforts in https://github.com/LumaPictures/cg-stubs
 
